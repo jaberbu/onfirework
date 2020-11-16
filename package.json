@@ -13,9 +13,12 @@
     "url": "git+https://github.com/jaberbu/onfirework.git"
   },
   "keywords": [
-    "Firebase", 
+    "Firebase",
     "Cloud Firestore"
   ],
   "author": "Jacek B. Budzynski (jacek.b.budzynski@gmail.com)",
-  "license": "BSD-2-Clause"
+  "license": "BSD-2-Clause",
+  "devDependencies": {
+    "@google-cloud/firestore": "^4.7.1"
+  }
 }
