@@ -19,6 +19,7 @@
   "author": "Jacek B. Budzynski (jacek.b.budzynski@gmail.com)",
   "license": "BSD-2-Clause",
   "devDependencies": {
-    "@google-cloud/firestore": "^4.7.1"
+    "@google-cloud/firestore": "^4.7.1",
+    "@types/node": "^14.14.7"
   }
 }
