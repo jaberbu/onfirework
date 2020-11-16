@@ -130,8 +130,8 @@ export class Onfirework<T> {
    * Reads documents according to filtering.
    * 
    * If the filter is not passed, it will show all documents.
-   * @param {T[]} [filter=[]]    ['FIELD', '==', 15] || [['FIELD', '>', 15], ['FIELD', '<', 2]]
-   * @return {*}  {Promise<any[]>}
+   * @param {any[]} [filter=[]]    ['FIELD', '==', 15] || [['FIELD', '>', 15], ['FIELD', '<', 2]]
+   * @return {*}  {Promise<T[]>}
    * @memberof Onfirework
    * @see https://firebase.google.com/docs/firestore/query-data/queries
    */
