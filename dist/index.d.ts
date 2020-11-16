@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { Firestore } from '@google-cloud/firestore';
 /**
  * Makes Firebase easier!
  *
@@ -7,16 +8,16 @@
  * @class Onfirework
  * @see https://github.com/jaberbu/onfirework
  */
-export declare class Onfirework {
-    db: any;
+export declare class Onfirework<T> {
+    db: Firestore;
     collection: string;
     /**
      * Creates an instance of Onfirework.
-     * @param {any} db
+     * @param {Firestore} db
      * @param {string} collectionPath
      * @memberof Onfirework
      */
-    constructor(db: any, collectionPath: string);
+    constructor(db: Firestore, collectionPath: string);
     /**
      * Add a new document to this collection with the specified data.
      *
@@ -26,7 +27,7 @@ export declare class Onfirework {
      * @return {*}  {Promise<void>}
      * @memberof Onfirework
      */
-    createDoc(data: any, id?: string): Promise<void>;
+    createDoc(data: T, id?: string): Promise<void>;
     /**
      * Reads the document referred to by this DocumentReference.
      * @param {string} id
@@ -39,11 +40,11 @@ export declare class Onfirework {
      *
      * The update will fail if applied to a document that does not exist.
      * @param {string} id
-     * @param {Partial<any>} updateData
+     * @param {Partial<T>} updateData
      * @return {*}  {Promise<void>}
      * @memberof Onfirework
      */
-    updateDoc(id: string, updateData: Partial<any>): Promise<void>;
+    updateDoc(id: string, updateData: Partial<T>): Promise<void>;
     /**
      * Deletes the document referred to by this DocumentReference.
      * @param {string} id
@@ -64,9 +65,9 @@ export declare class Onfirework {
      *
      * If the filter is not passed, it will show all documents.
      * @param {any[]} [filter=[]]    ['FIELD', '==', 15] || [['FIELD', '>', 15], ['FIELD', '<', 2]]
-     * @return {*}  {Promise<any[]>}
+     * @return {*}  {Promise<T[]>}
      * @memberof Onfirework
      * @see https://firebase.google.com/docs/firestore/query-data/queries
      */
-    listDocs(filter?: any[]): Promise<any[]>;
+    listDocs(filter?: any[]): Promise<T[]>;
 }

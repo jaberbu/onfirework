@@ -44,24 +44,24 @@ export class Onfirework<T> {
           .collection(this.collection)
           .add(data)
           .then(() => resolve())
-          .catch((err: any) =>
-            reject({
-              status: 500,
-              data: { message: 'Internal Server Error !', err }
-            })
-          );
+          .catch((err: any) => {
+            if(err) {console.error(err)}
+            reject(new Error('Internal Servicer Error !'))
+          });
       } else {
         this.db
           .collection(this.collection)
           .doc(id)
           .set(data)
           .then(() => resolve())
-          .catch((err: any) =>
-            reject({
-              status: 500,
-              data: { message: 'Internal Server Error !', err }
-            })
-          );
+          .catch((err: any) => {
+            if (err) {
+              console.error(err)
+              reject(Error(err))
+            } else {
+              reject(Error('Internal server error !'));
+            }
+          });
       }
     });
   }
@@ -82,20 +82,16 @@ export class Onfirework<T> {
           if (querySnapshot.data()) {
             resolve(<any>{ _id: id, ...querySnapshot.data() });
           } else {
-            reject({
-              status: 400,
-              data: {
-                message: 'Invalid Request !',
-                error: { errmsg: 'Document not found' }
-              }
-            });
+            throw new Error('Document not found')
           }
         })
         .catch((err: any) => {
-          reject({
-            status: 500,
-            data: { message: 'Internal Server Error !', err }
-          });
+          if (err) {
+            console.error(err)
+            reject(Error(err))
+          } else {
+            reject(Error('Internal server error !'));
+          }
         });
     });
   }
@@ -116,12 +112,14 @@ export class Onfirework<T> {
         .doc(id)
         .update(updateData)
         .then(() => resolve())
-        .catch((err: any) =>
-          reject({
-            status: 500,
-            data: { message: 'Internal Server Error !', err }
-          })
-        );
+        .catch((err: any) => {
+          if (err) {
+            console.error(err)
+            reject(Error(err))
+          } else {
+            reject(Error('Internal server error !'));
+          }
+        });
     });
   }
 
@@ -138,12 +136,14 @@ export class Onfirework<T> {
         .doc(id)
         .delete()
         .then(() => resolve())
-        .catch((err: any) =>
-          reject({
-            status: 500,
-            data: { message: 'Internal Server Error !', err }
-          })
-        );
+        .catch((err: any) => {
+          if (err) {
+            console.error(err)
+            reject(Error(err))
+          } else {
+            reject(Error('Internal server error !'));
+          }
+        });
     });
   }
 
@@ -169,10 +169,12 @@ export class Onfirework<T> {
           resolve();
         })
         .catch((err: any) => {
-          reject({
-            status: 500,
-            data: { message: 'Internal Server Error !', err }
-          });
+          if (err) {
+            console.error(err)
+            reject(Error(err))
+          } else {
+            reject(Error('Internal server error !'));
+          }
         });
     });
   }
@@ -204,10 +206,12 @@ export class Onfirework<T> {
           resolve(results);
         })
         .catch((err: any) => {
-          reject({
-            status: 500,
-            data: { message: 'Internal Server Error !', err }
-          });
+          if (err) {
+            console.error(err)
+            reject(Error(err))
+          } else {
+            reject(Error('Internal server error !'));
+          }
         });
     });
   }
