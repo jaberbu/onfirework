@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+import { Firestore, QueryDocumentSnapshot, QuerySnapshot } from '@google-cloud/firestore';
 
 /**
  * Makes Firebase easier!
@@ -9,18 +9,18 @@
  * @class Onfirework
  * @see https://github.com/jaberbu/onfirework
  */
-export class Onfirework {
-  db: any;
+export class Onfirework<T> {
+  db: Firestore;
   collection: string;
 
 
   /**
    * Creates an instance of Onfirework.
-   * @param {any} db
+   * @param {Firestore} db
    * @param {string} collectionPath
    * @memberof Onfirework
    */
-  constructor(db: any, collectionPath: string) {
+  constructor(db: Firestore, collectionPath: string) {
     this.db = db; 
     this.collection = collectionPath; 
   }
@@ -35,7 +35,7 @@ export class Onfirework {
    * @return {*}  {Promise<void>}
    * @memberof Onfirework
    */
-  createDoc(data: any, id?: string): Promise<void> {
+  createDoc(data: T, id?: string): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!id || !id.trim()) {
         this.db.collection(this.collection).add(data)
@@ -76,11 +76,11 @@ export class Onfirework {
    * 
    * The update will fail if applied to a document that does not exist.
    * @param {string} id
-   * @param {Partial<any>} updateData
+   * @param {Partial<T>} updateData
    * @return {*}  {Promise<void>}
    * @memberof Onfirework
    */
-  updateDoc(id: string, updateData: Partial<any>): Promise<void> {
+  updateDoc(id: string, updateData: Partial<T>): Promise<void> {
     return new Promise((resolve, reject) => {
       this.db.collection(this.collection).doc(id).update(updateData)
       .then(() => resolve())
@@ -130,19 +130,19 @@ export class Onfirework {
    * Reads documents according to filtering.
    * 
    * If the filter is not passed, it will show all documents.
-   * @param {any[]} [filter=[]]    ['FIELD', '==', 15] || [['FIELD', '>', 15], ['FIELD', '<', 2]]
+   * @param {T[]} [filter=[]]    ['FIELD', '==', 15] || [['FIELD', '>', 15], ['FIELD', '<', 2]]
    * @return {*}  {Promise<any[]>}
    * @memberof Onfirework
    * @see https://firebase.google.com/docs/firestore/query-data/queries
    */
-  listDocs(filter: any[]=[]): Promise<any[]> {
+  listDocs(filter: any[]=[]): Promise<T[]> {
     return new Promise((resolve, reject) => {
       let call = this.db.collection(this.collection);
       filter = (filter.length && !(filter[0] instanceof Array)) ? [[...filter]] : filter;
       filter.forEach((data: [any, any, any]) => call = <any>call.where(...data));
-      call.get().then((querySnapshot: any) => {
+      call.get().then((querySnapshot: QuerySnapshot) => {
         const results:any[] = [];
-        querySnapshot.forEach((doc: any) => results.push({_id: doc.id, ...doc.data()}));
+        querySnapshot.forEach((doc: QueryDocumentSnapshot) => results.push({_id: doc.id, ...doc.data()}));
         resolve(results);
       }).catch((err: any) => {
         reject({status: 500, data: { message: 'Internal Server Error !', err }});
