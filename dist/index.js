@@ -13,7 +13,7 @@ exports.Onfirework = void 0;
 class Onfirework {
     /**
      * Creates an instance of Onfirework.
-     * @param {any} db
+     * @param {Firestore} db
      * @param {string} collectionPath
      * @memberof Onfirework
      */
@@ -33,14 +33,32 @@ class Onfirework {
     createDoc(data, id) {
         return new Promise((resolve, reject) => {
             if (!id || !id.trim()) {
-                this.db.collection(this.collection).add(data)
+                this.db
+                    .collection(this.collection)
+                    .add(data)
                     .then(() => resolve())
-                    .catch((err) => reject({ status: 500, data: { message: 'Internal Server Error !', err } }));
+                    .catch((err) => {
+                    if (err) {
+                        console.error(err);
+                    }
+                    reject(new Error('Internal Servicer Error !'));
+                });
             }
             else {
-                this.db.collection(this.collection).doc(id).set(data)
+                this.db
+                    .collection(this.collection)
+                    .doc(id)
+                    .set(data)
                     .then(() => resolve())
-                    .catch((err) => reject({ status: 500, data: { message: 'Internal Server Error !', err } }));
+                    .catch((err) => {
+                    if (err) {
+                        console.error(err);
+                        reject(Error(err));
+                    }
+                    else {
+                        reject(Error('Internal server error !'));
+                    }
+                });
             }
         });
     }
@@ -52,15 +70,26 @@ class Onfirework {
      */
     readDoc(id) {
         return new Promise((resolve, reject) => {
-            this.db.collection(this.collection).doc(id).get().then((querySnapshot) => {
+            this.db
+                .collection(this.collection)
+                .doc(id)
+                .get()
+                .then((querySnapshot) => {
                 if (querySnapshot.data()) {
                     resolve(Object.assign({ _id: id }, querySnapshot.data()));
                 }
                 else {
-                    reject({ status: 400, data: { message: 'Invalid Request !', error: { errmsg: "Document not found" } } });
+                    throw new Error('Document not found');
                 }
-            }).catch((err) => {
-                reject({ status: 500, data: { message: 'Internal Server Error !', err } });
+            })
+                .catch((err) => {
+                if (err) {
+                    console.error(err);
+                    reject(Error(err));
+                }
+                else {
+                    reject(Error('Internal server error !'));
+                }
             });
         });
     }
@@ -69,15 +98,26 @@ class Onfirework {
      *
      * The update will fail if applied to a document that does not exist.
      * @param {string} id
-     * @param {Partial<any>} updateData
+     * @param {Partial<T>} updateData
      * @return {*}  {Promise<void>}
      * @memberof Onfirework
      */
     updateDoc(id, updateData) {
         return new Promise((resolve, reject) => {
-            this.db.collection(this.collection).doc(id).update(updateData)
+            this.db
+                .collection(this.collection)
+                .doc(id)
+                .update(updateData)
                 .then(() => resolve())
-                .catch((err) => reject({ status: 500, data: { message: 'Internal Server Error !', err } }));
+                .catch((err) => {
+                if (err) {
+                    console.error(err);
+                    reject(Error(err));
+                }
+                else {
+                    reject(Error('Internal server error !'));
+                }
+            });
         });
     }
     /**
@@ -88,9 +128,20 @@ class Onfirework {
      */
     deleteDoc(id) {
         return new Promise((resolve, reject) => {
-            this.db.collection(this.collection).doc(id).delete()
+            this.db
+                .collection(this.collection)
+                .doc(id)
+                .delete()
                 .then(() => resolve())
-                .catch((err) => reject({ status: 500, data: { message: 'Internal Server Error !', err } }));
+                .catch((err) => {
+                if (err) {
+                    console.error(err);
+                    reject(Error(err));
+                }
+                else {
+                    reject(Error('Internal server error !'));
+                }
+            });
         });
     }
     /**
@@ -103,13 +154,23 @@ class Onfirework {
     deleteDocs(filter) {
         return new Promise((resolve, reject) => {
             let call = this.db.collection(this.collection);
-            filter = (filter.length && !(filter[0] instanceof Array)) ? [[...filter]] : filter;
-            filter.forEach((data) => call = call.where(...data));
-            call.get().then((querySnapshot) => {
+            filter =
+                filter.length && !(filter[0] instanceof Array) ? [[...filter]] : filter;
+            filter.forEach((data) => (call = call.where(...data)));
+            call
+                .get()
+                .then((querySnapshot) => {
                 querySnapshot.forEach((doc) => doc.ref.delete());
                 resolve();
-            }).catch((err) => {
-                reject({ status: 500, data: { message: 'Internal Server Error !', err } });
+            })
+                .catch((err) => {
+                if (err) {
+                    console.error(err);
+                    reject(Error(err));
+                }
+                else {
+                    reject(Error('Internal server error !'));
+                }
             });
         });
     }
@@ -118,21 +179,31 @@ class Onfirework {
      *
      * If the filter is not passed, it will show all documents.
      * @param {any[]} [filter=[]]    ['FIELD', '==', 15] || [['FIELD', '>', 15], ['FIELD', '<', 2]]
-     * @return {*}  {Promise<any[]>}
+     * @return {*}  {Promise<T[]>}
      * @memberof Onfirework
      * @see https://firebase.google.com/docs/firestore/query-data/queries
      */
     listDocs(filter = []) {
         return new Promise((resolve, reject) => {
             let call = this.db.collection(this.collection);
-            filter = (filter.length && !(filter[0] instanceof Array)) ? [[...filter]] : filter;
-            filter.forEach((data) => call = call.where(...data));
-            call.get().then((querySnapshot) => {
+            filter =
+                filter.length && !(filter[0] instanceof Array) ? [[...filter]] : filter;
+            filter.forEach((data) => (call = call.where(...data)));
+            call
+                .get()
+                .then((querySnapshot) => {
                 const results = [];
                 querySnapshot.forEach((doc) => results.push(Object.assign({ _id: doc.id }, doc.data())));
                 resolve(results);
-            }).catch((err) => {
-                reject({ status: 500, data: { message: 'Internal Server Error !', err } });
+            })
+                .catch((err) => {
+                if (err) {
+                    console.error(err);
+                    reject(Error(err));
+                }
+                else {
+                    reject(Error('Internal server error !'));
+                }
             });
         });
     }
