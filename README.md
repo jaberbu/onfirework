@@ -76,13 +76,13 @@ The update will fail if applied to a document that does not exist.
 Deletes the document referred to by this DocumentReference.
 
 
-#### ```deleteDocs(filter: [FieldPath, WhereFilterOp, any][]=[]): Promise<void>```
+#### ```deleteDocs(filter: [FieldPath, WhereFilterOp, any][] = []): Promise<void>```
 Delete documents according to filtering.
 
 If the filter is not passed, it will remove all documents.
 
 
-#### ```listDocs(filter: [FieldPath, WhereFilterOp, any][]=[]): Promise<Interface[]>```
+#### ```listDocs(filter: [FieldPath, WhereFilterOp, any][] = []): Promise<Interface[]>```
 Reads documents according to filtering.
   
 If the filter is not passed, it will show all documents.
