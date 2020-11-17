@@ -2,8 +2,11 @@
 import {
   Firestore,
   QueryDocumentSnapshot,
-  QuerySnapshot
+  QuerySnapshot,
+  FieldPath, 
+  WhereFilterOp
 } from '@google-cloud/firestore';
+
 
 /**
  * Makes Firebase easier!
@@ -149,23 +152,21 @@ export class Onfirework<T> {
 
   /**
    * Delete documents according to filtering.
-   * @param {any[]} filter   ['FIELD', '==', 15] || [['FIELD', '>', 15], ['FIELD', '<', 2]]
+   * @param {([FieldPath | string, WhereFilterOp, any][])} [filter=[]]
    * @return {*}  {Promise<void>}
    * @memberof Onfirework
    * @see https://firebase.google.com/docs/firestore/query-data/queries
    */
-  deleteDocs(filter: any[]): Promise<void> {
+  deleteDocs(filter: [FieldPath | string, WhereFilterOp, any][]=[]): Promise<void> {
     return new Promise((resolve, reject) => {
       let call = this.db.collection(this.collection);
-      filter =
-        filter.length && !(filter[0] instanceof Array) ? [[...filter]] : filter;
       filter.forEach(
-        (data: [any, any, any]) => (call = <any>call.where(...data))
+        (data:  [FieldPath | string, WhereFilterOp, any]) => (call = <any>call.where(...data))
       );
       call
         .get()
-        .then((querySnapshot: any) => {
-          querySnapshot.forEach((doc: any) => doc.ref.delete());
+        .then((querySnapshot: QuerySnapshot) => {
+          querySnapshot.forEach((doc: QueryDocumentSnapshot) => doc.ref.delete());
           resolve();
         })
         .catch((err: any) => {
@@ -183,18 +184,16 @@ export class Onfirework<T> {
    * Reads documents according to filtering.
    *
    * If the filter is not passed, it will show all documents.
-   * @param {any[]} [filter=[]]    ['FIELD', '==', 15] || [['FIELD', '>', 15], ['FIELD', '<', 2]]
+   * @param {([FieldPath | string, WhereFilterOp, any][])} [filter=[]]
    * @return {*}  {Promise<T[]>}
    * @memberof Onfirework
    * @see https://firebase.google.com/docs/firestore/query-data/queries
    */
-  listDocs(filter: any[] = []): Promise<T[]> {
+  listDocs(filter: [FieldPath | string, WhereFilterOp, any][]=[]): Promise<T[]> {
     return new Promise((resolve, reject) => {
       let call = this.db.collection(this.collection);
-      filter =
-        filter.length && !(filter[0] instanceof Array) ? [[...filter]] : filter;
       filter.forEach(
-        (data: [any, any, any]) => (call = <any>call.where(...data))
+        (data: [FieldPath | string, WhereFilterOp, any]) => (call = <any>call.where(...data))
       );
       call
         .get()
