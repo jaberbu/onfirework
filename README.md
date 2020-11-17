@@ -56,33 +56,33 @@ function bar() {
 
 ## Available methods
 
-### ```createDoc(data: Inreface, id?: DocumentReference): Promise<void>```
+#### ```createDoc(data: Inreface, id?: DocumentReference): Promise<void>```
 Add a new document to this collection with the specified data.
 
 If the DocumentReference is not passed it will be created automatically.
 
 
-### ```readDoc(id: DocumentReference): Promise<Interface>```
+#### ```readDoc(id: DocumentReference): Promise<Interface>```
 Reads the document referred to by this DocumentReference.
 
 
-### ```updateDoc(id: DocumentReference, data: Partial<Inreface>): Promise<void>```
+#### ```updateDoc(id: DocumentReference, data: Partial<Inreface>): Promise<void>```
 Updates fields in the document referred to by this DocumentReference.
 
 The update will fail if applied to a document that does not exist.
 
 
-### ```deleteDoc(id: DocumentReference): Promise<void>```
+#### ```deleteDoc(id: DocumentReference): Promise<void>```
 Deletes the document referred to by this DocumentReference.
 
 
-### ```deleteDocs(filter: [FieldPath, WhereFilterOp, any][]): Promise<void>```
+#### ```deleteDocs(filter: [FieldPath, WhereFilterOp, any][]): Promise<void>```
 Delete documents according to filtering.
 
 If the filter is not passed, it will remove all documents.
 
 
-### ```listDocs(filter: [FieldPath, WhereFilterOp, any][]): Promise<Interface[]>```
+#### ```listDocs(filter: [FieldPath, WhereFilterOp, any][]): Promise<Interface[]>```
 Reads documents according to filtering.
   
 If the filter is not passed, it will show all documents.
