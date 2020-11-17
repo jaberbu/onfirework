@@ -1,22 +1,28 @@
 # Firebase for dummies [BETA].
 
+[![npm][npm-image]][npm-url]
+
+[npm-image]: https://img.shields.io/npm/v/onfirework.svg?style=flat-square
+[npm-url]: https://www.npmjs.com/package/onfirework
+
 Easiest way to access to Cloud Firestore collections
 
-## Getting Started
+## Install
 
 ```
 npm i onfirework
 ```
 
-Example:
+
+## Usage
 ```
 import { Onfirework } from 'onfirework';
 
-const my_collection_1 = new Onfirework(db, 'COLLECTION_NAME_1')
-const my_collection_2 = new Onfirework(db, 'COLLECTION_NAME_2')
+const my_collection = new Onfirework(db, 'COLLECTION_NAME_1')
 
 ...
-my_collection_1.listDocs()
+my_collection.listDocs([[ 'name', '==', 'Oliver' ],[ 'age', '>=', 21 ]])
+my_collection.readDoc()
 ...
 ```
 
@@ -24,4 +30,4 @@ my_collection_1.listDocs()
 
 
 ## License
-The project is licensed under the [BSD License](LICENSE)..
+The project is licensed under the [BSD License](LICENSE).
