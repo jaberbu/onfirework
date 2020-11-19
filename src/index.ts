@@ -3,9 +3,9 @@ import {
   Firestore,
   QueryDocumentSnapshot,
   QuerySnapshot,
-  FieldPath, 
   WhereFilterOp
 } from '@google-cloud/firestore';
+import { Filter } from './filter.interface';
 
 
 /**
@@ -152,16 +152,16 @@ export class Onfirework<T> {
 
   /**
    * Delete documents according to filtering.
-   * @param {([FieldPath | string, WhereFilterOp, any][])} [filter=[]]
+   * @param {(Filter<T>[])} [filter=[]]
    * @return {*}  {Promise<void>}
    * @memberof Onfirework
    * @see https://firebase.google.com/docs/firestore/query-data/queries
    */
-  deleteDocs(filter: [FieldPath | string, WhereFilterOp, any][]=[]): Promise<void> {
+  deleteDocs(filter: Filter<T>[]=[]): Promise<void> {
     return new Promise((resolve, reject) => {
       let call = this.db.collection(this.collection);
       filter.forEach(
-        (data:  [FieldPath | string, WhereFilterOp, any]) => (call = <any>call.where(...data))
+        (data: [any, WhereFilterOp, any]) => (call = <any>call.where(...data))
       );
       call
         .get()
@@ -184,16 +184,16 @@ export class Onfirework<T> {
    * Reads documents according to filtering.
    *
    * If the filter is not passed, it will show all documents.
-   * @param {([FieldPath | string, WhereFilterOp, any][])} [filter=[]]
+   * @param {(Filter<T>[])} [filter=[]]
    * @return {*}  {Promise<T[]>}
    * @memberof Onfirework
    * @see https://firebase.google.com/docs/firestore/query-data/queries
    */
-  listDocs(filter: [FieldPath | string, WhereFilterOp, any][]=[]): Promise<T[]> {
+  listDocs(filter: Filter<T>[]=[]): Promise<T[]> {
     return new Promise((resolve, reject) => {
       let call = this.db.collection(this.collection);
       filter.forEach(
-        (data: [FieldPath | string, WhereFilterOp, any]) => (call = <any>call.where(...data))
+        (data: [any, WhereFilterOp, any]) => (call = <any>call.where(...data))
       );
       call
         .get()
