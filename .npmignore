@@ -2,3 +2,8 @@
 src
 *.tgz
 tsconfig.json
+lab
+.editorconfig
+.eslintignore
+.eslintrc.js
+.prettierrc

@@ -3,18 +3,13 @@
     "module": "commonjs",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
-    "outDir": "dist",
+    "outDir": "lib",
     "sourceMap": true,
     "strict": true,
-    "declaration": true,
-    "target": "es2017",
-    "types": ["node"]
+    "target": "es2017"
   },
   "compileOnSave": true,
   "include": [
     "src"
   ],
-  "exclude": [
-    "lab"
-  ]
 }

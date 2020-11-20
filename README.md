@@ -1,27 +1,112 @@
 # Firebase for dummies [BETA].
 
+[![npm][npm-image]][npm-url]
+
+[npm-image]: https://img.shields.io/npm/v/onfirework.svg?style=flat-square
+[npm-url]: https://www.npmjs.com/package/onfirework
+
 Easiest way to access to Cloud Firestore collections
 
-## Getting Started
+## Install
 
 ```
-npm i onfirework
+npm install onfirework --save
 ```
 
-Example:
+
+## Example usage
 ```
+import * as firebase from 'firebase-admin';
 import { Onfirework } from 'onfirework';
 
-const my_collection_1 = new Onfirework(db, 'COLLECTION_NAME_1')
-const my_collection_2 = new Onfirework(db, 'COLLECTION_NAME_2')
+interface MyCollection {
+  name: string,
+  age: number,
+} 
 
-...
-my_collection_1.listDocs()
-...
+firebase.initializeApp();
+let db = firebase.firestore();
+
+const foo = new Onfirework<MyCollection>(db, 'MY_COLLECTION')
+
+function bar() {
+  foo.listDocs().then((results:MyCollection[]) => {
+    ...
+  });
+}
 ```
 
+Or 
+
+```
+import * as firebase from 'firebase-admin';
+import { Onfirework } from 'onfirework';
+
+firebase.initializeApp();
+let db = firebase.firestore();
+
+const foo = new Onfirework(db, 'MY_COLLECTION')
+
+function bar() {
+  foo.listDocs().then(results => {
+    ...
+  });
+}
+```
+
+## Available methods
+
+##### ```createDoc(data: Inreface, id?: DocumentReference): Promise<void>```
+Add a new document to this collection with the specified data.
+
+If the DocumentReference is not passed it will be created automatically.
+
+
+##### ```readDoc(id: DocumentReference): Promise<Interface>```
+Reads the document referred to by this DocumentReference.
+
+
+##### ```updateDoc(id: DocumentReference, data: Partial<Inreface>): Promise<void>```
+Updates fields in the document referred to by this DocumentReference.
+
+The update will fail if applied to a document that does not exist.
+
+
+##### ```deleteDoc(id: DocumentReference): Promise<void>```
+Deletes the document referred to by this DocumentReference.
+
+
+##### ```deleteDocs(filter?: [FieldPath, WhereFilterOp, any][]): Promise<void>```
+Delete documents according to filtering.
+
+If the filter is not passed, it will remove all documents.
+
+
+##### ```listDocs(filter?: [FieldPath, WhereFilterOp, any][], limit?: Number): Promise<Interface[]>```
+Reads documents according to filtering.
+
+If the filter is not passed, it will show all documents.
+```
+SELECT * FROM foo
+
+foo.listDocs()
+```
+
+```
+SELECT * FROM foo LIMIT 2
+
+foo.listDocs([], 2)
+```
+```
+SELECT * FROM foo WHERE foo.BRAND = 'Ducati' AND foo.COLOR = 'White' LIMIT 2
+
+foo.listDocs([['BRAND', '==', 'Ducati'], ['COLOR', '==', 'White']], 2)
+```
+Keep in mind Firebase [Query limitations](https://firebase.google.com/docs/firestore/query-data/queries#query_limitations)
+
+---------------------------------------
 
 
 
 ## License
-The project is licensed under the [BSD License](LICENSE)..
+The project is licensed under the [BSD License](LICENSE).
