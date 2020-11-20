@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 import {
+  DocumentData,
   Firestore,
   QueryDocumentSnapshot,
   QuerySnapshot,
-  WhereFilterOp
 } from '@google-cloud/firestore';
+
 import { Filter } from './filter.interface';
 
+export { Filter }
 
 /**
  * Makes Firebase easier!
@@ -152,17 +154,15 @@ export class Onfirework<T> {
 
   /**
    * Delete documents according to filtering.
-   * @param {(Filter<T>[])} [filter=[]]
+   * @param {(Filter<T>[])} [filter]
    * @return {*}  {Promise<void>}
    * @memberof Onfirework
    * @see https://firebase.google.com/docs/firestore/query-data/queries
    */
-  deleteDocs(filter: Filter<T>[]=[]): Promise<void> {
+  deleteDocs(filter?: Filter<T>[]): Promise<void> {
     return new Promise((resolve, reject) => {
-      let call = this.db.collection(this.collection);
-      filter.forEach(
-        (data: [any, WhereFilterOp, any]) => (call = <any>call.where(...data))
-      );
+      let call:DocumentData = this.db.collection(this.collection);
+      if (filter) filter.map((data: Filter<T>) => call = call.where(...data));
       call
         .get()
         .then((querySnapshot: QuerySnapshot) => {
@@ -184,17 +184,17 @@ export class Onfirework<T> {
    * Reads documents according to filtering.
    *
    * If the filter is not passed, it will show all documents.
-   * @param {(Filter<T>[])} [filter=[]]
+   * @param {(Filter<T>[])} [filter]
+   * @param {number} [limit]
    * @return {*}  {Promise<T[]>}
    * @memberof Onfirework
    * @see https://firebase.google.com/docs/firestore/query-data/queries
    */
-  listDocs(filter: Filter<T>[]=[]): Promise<T[]> {
+  listDocs(filter?: Filter<T>[], limit?:number): Promise<T[]> {
     return new Promise((resolve, reject) => {
-      let call = this.db.collection(this.collection);
-      filter.forEach(
-        (data: [any, WhereFilterOp, any]) => (call = <any>call.where(...data))
-      );
+      let call:DocumentData = this.db.collection(this.collection);
+      if (filter) filter.map((data: Filter<T>) => call = call.where(...data));
+      if (limit) call = call.limit(limit)
       call
         .get()
         .then((querySnapshot: QuerySnapshot) => {
