@@ -190,7 +190,7 @@ export class Onfirework<T> {
    * @memberof Onfirework
    * @see https://firebase.google.com/docs/firestore/query-data/queries
    */
-  listDocs(filter?: Filter<T>[], limit?:number): Promise<T[]> {
+  listDocs(filter?: Filter<T>[], limit?:number, idNeeded = false): Promise<T[]> {
     return new Promise((resolve, reject) => {
       let call:DocumentData = this.db.collection(this.collection);
       if (filter) filter.map((data: Filter<T>) => call = call.where(...data));
@@ -200,7 +200,7 @@ export class Onfirework<T> {
         .then((querySnapshot: QuerySnapshot) => {
           const results: any[] = [];
           querySnapshot.forEach((doc: QueryDocumentSnapshot) =>
-            results.push({ _id: doc.id, ...doc.data() })
+            idNeeded ? results.push({ _id: doc.id, ...doc.data() }) : results.push({ ...doc.data() })
           );
           resolve(results);
         })
