@@ -6,9 +6,10 @@ import {
   QuerySnapshot,
 } from '@google-cloud/firestore';
 
-import { Filter } from './filter.interface';
+import { Filter } from './type.filter';
+import { Result } from './type.result';
 
-export { Filter }
+export { Filter, Result }
 
 /**
  * Makes Firebase easier!
@@ -77,15 +78,15 @@ export class Onfirework<T> {
    * @return {*}  {Promise<any>}
    * @memberof Onfirework
    */
-  readDoc(id: string): Promise<any> {
+  readDoc(id: string): Promise<Result<T>> {
     return new Promise((resolve, reject) => {
       this.db
         .collection(this.collection)
         .doc(id)
         .get()
-        .then((querySnapshot: any) => {
+        .then((querySnapshot) => {
           if (querySnapshot.data()) {
-            resolve(<any>{ _id: id, ...querySnapshot.data() });
+            resolve(<Result<T>>{ _id: id, ...querySnapshot.data() });
           } else {
             throw new Error('Document not found')
           }
@@ -161,8 +162,8 @@ export class Onfirework<T> {
    */
   deleteDocs(filter?: Filter<T>[]): Promise<void> {
     return new Promise((resolve, reject) => {
-      let call:DocumentData = this.db.collection(this.collection);
-      if (filter) filter.map((data: Filter<T>) => call = call.where(...data));
+      const call:DocumentData = this.db.collection(this.collection);
+      if (filter) filter.map((data: Filter<T>) => call.where(...data));
       call
         .get()
         .then((querySnapshot: QuerySnapshot) => {
@@ -184,23 +185,23 @@ export class Onfirework<T> {
    * Reads documents according to filtering.
    *
    * If the filter is not passed, it will show all documents.
-   * @param {(Filter<T>[])} [filter]
+   * @param {Filter<Result<T>>[]} [filter]
    * @param {number} [limit]
-   * @return {*}  {Promise<T[]>}
+   * @return {*}  {Promise<Result<T>[]>}
    * @memberof Onfirework
    * @see https://firebase.google.com/docs/firestore/query-data/queries
    */
-  listDocs(filter?: Filter<T>[], limit?:number): Promise<T[]> {
+  listDocs(filter?: Filter<Result<T>>[], limit?:number): Promise<Result<T>[]> {
     return new Promise((resolve, reject) => {
       let call:DocumentData = this.db.collection(this.collection);
-      if (filter) filter.map((data: Filter<T>) => call = call.where(...data));
+      if (filter) filter.map((data: Filter<Result<T>>) => call.where(...data));
       if (limit) call = call.limit(limit)
       call
         .get()
         .then((querySnapshot: QuerySnapshot) => {
-          const results: any[] = [];
+          const results: Result<T>[] = [];
           querySnapshot.forEach((doc: QueryDocumentSnapshot) =>
-            results.push({ _id: doc.id, ...doc.data() })
+            results.push(<Result<T>>{ _id: doc.id, ...doc.data() })
           );
           resolve(results);
         })

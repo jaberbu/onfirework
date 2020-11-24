@@ -1,5 +1,4 @@
 interface Schema {
-	_id?: string | undefined;
   BRAND: string;
   MODEL: string;
 	HORSE_POWER: number;
