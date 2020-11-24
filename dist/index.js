@@ -146,17 +146,16 @@ class Onfirework {
     }
     /**
      * Delete documents according to filtering.
-     * @param {any[]} filter   ['FIELD', '==', 15] || [['FIELD', '>', 15], ['FIELD', '<', 2]]
+     * @param {(Filter<T>[])} [filter]
      * @return {*}  {Promise<void>}
      * @memberof Onfirework
      * @see https://firebase.google.com/docs/firestore/query-data/queries
      */
     deleteDocs(filter) {
         return new Promise((resolve, reject) => {
-            let call = this.db.collection(this.collection);
-            filter =
-                filter.length && !(filter[0] instanceof Array) ? [[...filter]] : filter;
-            filter.forEach((data) => (call = call.where(...data)));
+            const call = this.db.collection(this.collection);
+            if (filter)
+                filter.map((data) => call.where(...data));
             call
                 .get()
                 .then((querySnapshot) => {
@@ -178,17 +177,19 @@ class Onfirework {
      * Reads documents according to filtering.
      *
      * If the filter is not passed, it will show all documents.
-     * @param {any[]} [filter=[]]    ['FIELD', '==', 15] || [['FIELD', '>', 15], ['FIELD', '<', 2]]
-     * @return {*}  {Promise<T[]>}
+     * @param {Filter<Result<T>>[]} [filter]
+     * @param {number} [limit]
+     * @return {*}  {Promise<Result<T>[]>}
      * @memberof Onfirework
      * @see https://firebase.google.com/docs/firestore/query-data/queries
      */
-    listDocs(filter = []) {
+    listDocs(filter, limit) {
         return new Promise((resolve, reject) => {
             let call = this.db.collection(this.collection);
-            filter =
-                filter.length && !(filter[0] instanceof Array) ? [[...filter]] : filter;
-            filter.forEach((data) => (call = call.where(...data)));
+            if (filter)
+                filter.map((data) => call.where(...data));
+            if (limit)
+                call = call.limit(limit);
             call
                 .get()
                 .then((querySnapshot) => {

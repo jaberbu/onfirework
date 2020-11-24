@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 import { Firestore } from '@google-cloud/firestore';
+import { Filter } from './type.filter';
+import { Result } from './type.result';
+export { Filter, Result };
 /**
  * Makes Firebase easier!
  *
@@ -34,7 +37,7 @@ export declare class Onfirework<T> {
      * @return {*}  {Promise<any>}
      * @memberof Onfirework
      */
-    readDoc(id: string): Promise<any>;
+    readDoc(id: string): Promise<Result<T>>;
     /**
      * Updates fields in the document referred to by this DocumentReference.
      *
@@ -54,20 +57,21 @@ export declare class Onfirework<T> {
     deleteDoc(id: string): Promise<void>;
     /**
      * Delete documents according to filtering.
-     * @param {any[]} filter   ['FIELD', '==', 15] || [['FIELD', '>', 15], ['FIELD', '<', 2]]
+     * @param {(Filter<T>[])} [filter]
      * @return {*}  {Promise<void>}
      * @memberof Onfirework
      * @see https://firebase.google.com/docs/firestore/query-data/queries
      */
-    deleteDocs(filter: any[]): Promise<void>;
+    deleteDocs(filter?: Filter<T>[]): Promise<void>;
     /**
      * Reads documents according to filtering.
      *
      * If the filter is not passed, it will show all documents.
-     * @param {any[]} [filter=[]]    ['FIELD', '==', 15] || [['FIELD', '>', 15], ['FIELD', '<', 2]]
-     * @return {*}  {Promise<T[]>}
+     * @param {Filter<Result<T>>[]} [filter]
+     * @param {number} [limit]
+     * @return {*}  {Promise<Result<T>[]>}
      * @memberof Onfirework
      * @see https://firebase.google.com/docs/firestore/query-data/queries
      */
-    listDocs(filter?: any[]): Promise<T[]>;
+    listDocs(filter?: Filter<Result<T>>[], limit?: number): Promise<Result<T>[]>;
 }
