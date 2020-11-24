@@ -6,8 +6,8 @@ import {
   QuerySnapshot,
 } from '@google-cloud/firestore';
 
-import { Filter } from './filter.type';
-import { Result } from './result.type';
+import { Filter } from './type.filter';
+import { Result } from './type.result';
 
 export { Filter, Result }
 
