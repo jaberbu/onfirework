@@ -4,7 +4,7 @@ import * as admin from 'firebase-admin';
 import { Schema as BikeSchema } from './models/bikes';
 import { initial_data as bikes_data } from './models/bikes';
 
-import { Onfirework } from '../../../src/index';
+import { Filter, Onfirework, Result } from '../../../src/index';
 
 
 admin.initializeApp()
@@ -23,12 +23,15 @@ export const loadInitData = functions.https.onRequest((request, response) => {
 });
 
 
-export const listCall = functions.https.onRequest((request, response) => {
+export const listCall = functions.https.onRequest(async (request, response) => {
   functions.logger.info("listCall", {structuredData: true});
   try {
-    bike
-    .listDocs([['BRAND', '==', 'Ducati']])
-    .then((results:BikeSchema[]) => response.send(results))
+
+    const where:Filter<BikeSchema>[] = [['BRAND', '==', 'Ducati'], ['HORSE_POWER', '>=', 70]]
+    const ducati:Result<BikeSchema>[] = await bike.listDocs(where)
+
+    response.send(ducati)
+
   } catch(err) {
     response.send(err)
   }

@@ -177,7 +177,7 @@ class Onfirework {
      * Reads documents according to filtering.
      *
      * If the filter is not passed, it will show all documents.
-     * @param {Filter<Result<T>>[]} [filter]
+     * @param {Filter<T>[]} [filter]
      * @param {number} [limit]
      * @return {*}  {Promise<Result<T>[]>}
      * @memberof Onfirework
@@ -187,7 +187,10 @@ class Onfirework {
         return new Promise((resolve, reject) => {
             let call = this.db.collection(this.collection);
             if (filter)
-                filter.map((data) => call.where(...data));
+                filter.map((data) => {
+                    call = call.where(...data);
+                    return call;
+                });
             if (limit)
                 call = call.limit(limit);
             call
