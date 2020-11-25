@@ -67,11 +67,11 @@ export declare class Onfirework<T> {
      * Reads documents according to filtering.
      *
      * If the filter is not passed, it will show all documents.
-     * @param {Filter<Result<T>>[]} [filter]
+     * @param {Filter<T>[]} [filter]
      * @param {number} [limit]
      * @return {*}  {Promise<Result<T>[]>}
      * @memberof Onfirework
      * @see https://firebase.google.com/docs/firestore/query-data/queries
      */
-    listDocs(filter?: Filter<Result<T>>[], limit?: number): Promise<Result<T>[]>;
+    listDocs(filter?: Filter<T>[], limit?: number): Promise<Result<T>[]>;
 }

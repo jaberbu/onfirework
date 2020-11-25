@@ -17,40 +17,30 @@ npm install onfirework --save
 ## Example usage
 ```
 import * as firebase from 'firebase-admin';
-import { Onfirework } from 'onfirework';
+import { Onfirework, Filter, Result } from 'onfirework';
 
-interface MyCollection {
-  name: string,
-  age: number,
-} 
-
-firebase.initializeApp();
-let db = firebase.firestore();
-
-const foo = new Onfirework<MyCollection>(db, 'MY_COLLECTION')
-
-function bar() {
-  foo.listDocs().then((results:MyCollection[]) => {
-    ...
-  });
+interface BikeSchema {
+  BRAND: String;
+  MODEL: String;
+  HORSE_POWER: Number;
 }
-```
-
-Or 
-
-```
-import * as firebase from 'firebase-admin';
-import { Onfirework } from 'onfirework';
 
 firebase.initializeApp();
 let db = firebase.firestore();
 
-const foo = new Onfirework(db, 'MY_COLLECTION')
+const bikes = new Onfirework<BikeSchema>(db, 'BIKES')
 
-function bar() {
-  foo.listDocs().then(results => {
-    ...
-  });
+/**
+ * Select all docs from BIKES collection where BRAND is Ducati and HORSE_POWER greater or equal to 70
+ */
+async function listBikes() {
+  
+  const where:Filter<BikeSchema>[] = [
+    ['BRAND', '==', 'Ducati'], ['HORSE_POWER', '>=', 70]
+  ]
+  const ducati:Result<BikeSchema>[] = await bikes.listDocs(where)
+
+  console.log(ducati)
 }
 ```
 
@@ -62,8 +52,8 @@ Add a new document to this collection with the specified data.
 If the DocumentReference is not passed it will be created automatically.
 
 
-##### ```readDoc(id: DocumentReference): Promise<Interface>```
-Reads the document referred to by this DocumentReference.
+##### ```readDoc(id: DocumentReference): Promise<Result<Interface>>```
+Read the document referred to by this DocumentReference.
 
 
 ##### ```updateDoc(id: DocumentReference, data: Partial<Inreface>): Promise<void>```
@@ -82,7 +72,7 @@ Delete documents according to filtering.
 If the filter is not passed, it will remove all documents.
 
 
-##### ```listDocs(filter?: [FieldPath, WhereFilterOp, any][], limit?: Number): Promise<Interface[]>```
+##### ```listDocs(filter?: [FieldPath, WhereFilterOp, any][], limit?: Number): Promise<Result<Interface>[]>```
 Reads documents according to filtering.
 
 If the filter is not passed, it will show all documents.
