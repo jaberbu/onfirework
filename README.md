@@ -94,6 +94,10 @@ foo.listDocs([['BRAND', '==', 'Ducati'], ['COLOR', '==', 'White']], 2)
 ```
 Keep in mind Firebase [Query limitations](https://firebase.google.com/docs/firestore/query-data/queries#query_limitations)
 
+
+##### ```listFirst(filter?: [FieldPath, WhereFilterOp, any][]): Promise<Result<Interface>>```
+Gets first document according to filtering.
+
 ---------------------------------------
 
 

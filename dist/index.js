@@ -211,6 +211,40 @@ class Onfirework {
             });
         });
     }
+    /**
+     * Gets first document according to filtering.
+     *
+     * @param {Filter<T>[]} [filter]
+     * @return {*}  {Promise<Result<T>>}
+     * @memberof Onfirework
+     * @see https://firebase.google.com/docs/firestore/query-data/queries
+     */
+    listFirst(filter) {
+        return new Promise((resolve, reject) => {
+            let call = this.db.collection(this.collection);
+            if (filter)
+                filter.map((data) => {
+                    call = call.where(...data);
+                    return call;
+                });
+            call.limit(1)
+                .get()
+                .then((querySnapshot) => {
+                const results = [];
+                querySnapshot.forEach((doc) => results.push(Object.assign({ _id: doc.id }, doc.data())));
+                resolve(results[0]);
+            })
+                .catch((err) => {
+                if (err) {
+                    console.error(err);
+                    reject(Error(err));
+                }
+                else {
+                    reject(Error('Internal server error !'));
+                }
+            });
+        });
+    }
 }
 exports.Onfirework = Onfirework;
 //# sourceMappingURL=index.js.map

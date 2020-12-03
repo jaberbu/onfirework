@@ -74,4 +74,13 @@ export declare class Onfirework<T> {
      * @see https://firebase.google.com/docs/firestore/query-data/queries
      */
     listDocs(filter?: Filter<T>[], limit?: number): Promise<Result<T>[]>;
+    /**
+     * Gets first document according to filtering.
+     *
+     * @param {Filter<T>[]} [filter]
+     * @return {*}  {Promise<Result<T>>}
+     * @memberof Onfirework
+     * @see https://firebase.google.com/docs/firestore/query-data/queries
+     */
+    listFirst(filter?: Filter<T>[]): Promise<Result<T>>;
 }

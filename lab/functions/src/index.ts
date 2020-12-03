@@ -38,6 +38,21 @@ export const listCall = functions.https.onRequest(async (request, response) => {
 });
 
 
+export const listFirst = functions.https.onRequest(async (request, response) => {
+  functions.logger.info("listFirst", {structuredData: true});
+  try {
+
+    const where:Filter<BikeSchema>[] = [['BRAND', '==', 'Ducati'], ['MODEL', '==', '797']]
+    const ducati:Result<BikeSchema> = await bike.listFirst(where)
+
+    response.send(ducati || 'No Brand')
+
+  } catch(err) {
+    response.send(err)
+  }
+});
+
+
 export const deleteCall = functions.https.onRequest((request, response) => {
   functions.logger.info("deleteCall", {structuredData: true});
   try {
