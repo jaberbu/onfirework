@@ -218,4 +218,41 @@ export class Onfirework<T> {
         });
     });
   }
+
+
+  /**
+   * Gets first document according to filtering.
+   *
+   * @param {Filter<T>[]} [filter]
+   * @return {*}  {Promise<Result<T>>}
+   * @memberof Onfirework
+   * @see https://firebase.google.com/docs/firestore/query-data/queries
+   */
+  listFirst(filter?: Filter<T>[]): Promise<Result<T>> {
+    return new Promise((resolve, reject) => {
+      let call:DocumentData = this.db.collection(this.collection);
+      if (filter) filter.map((data: Filter<T>) => {
+        call = call.where(...data);
+        return call;
+      });
+      call.limit(1)
+        .get()
+        .then((querySnapshot: QuerySnapshot) => {
+          const results: Result<T>[] = [];
+          querySnapshot.forEach((doc: QueryDocumentSnapshot) =>
+            results.push(<Result<T>>{ _id: doc.id, ...doc.data() })
+          );
+          resolve(results[0]);
+        })
+        .catch((err: any) => {
+          if (err) {
+            console.error(err)
+            reject(Error(err))
+          } else {
+            reject(Error('Internal server error !'));
+          }
+        });
+    });
+  }
+
 }
