@@ -27,10 +27,37 @@ export const listCall = functions.https.onRequest(async (request, response) => {
   functions.logger.info("listCall", {structuredData: true});
   try {
 
-    const where:Filter<BikeSchema>[] = [['BRAND', '==', 'Ducati'], ['HORSE_POWER', '>=', 70]]
+    const where:Filter<BikeSchema>[] = [
+      ['BRAND', '==', 'Ducati'], 
+      ['HORSE_POWER', '>=', 70]
+    ]
     const ducati:Result<BikeSchema>[] = await bike.listDocs(where)
 
     response.send(ducati)
+
+  } catch(err) {
+    response.send(err)
+  }
+});
+
+
+export const listIn = functions.https.onRequest(async (request, response) => {
+  functions.logger.info("listCall", {structuredData: true});
+  try {
+
+    let where:Filter<BikeSchema>[] = [
+      ['BRAND', '==', 'Ducati'], 
+      ['CATEGORY', 'array-contains', 'race']
+    ]
+    const race:Result<BikeSchema>[] = await bike.listDocs(where)
+
+    where = [
+      ['BRAND', '==', 'Ducati'], 
+      ['MODEL', 'in', ['797', '821']]
+    ]
+    const ducati_797_821:Result<BikeSchema>[] = await bike.listDocs(where)
+
+    response.send({race, ducati_797_821})
 
   } catch(err) {
     response.send(err)
