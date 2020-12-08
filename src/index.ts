@@ -5,6 +5,7 @@ import {
   QueryDocumentSnapshot,
   QuerySnapshot,
 } from '@google-cloud/firestore';
+import * as _ from "lodash";
 
 import { Filter } from './type.filter';
 import { Result } from './type.result';
@@ -191,34 +192,52 @@ export class Onfirework<T> {
    * @memberof Onfirework
    * @see https://firebase.google.com/docs/firestore/query-data/queries
    */
-  listDocs(filter?: Filter<T>[], limit?:number): Promise<Result<T>[]> {
-    return new Promise((resolve, reject) => {
-      let call:DocumentData = this.db.collection(this.collection);
-      if (filter) filter.map((data: Filter<T>) => {
+  async listDocs(filter?: Filter<T>[], limit?:number): Promise<Result<T>[]> {
+    let call:DocumentData = this.db.collection(this.collection);
+    const rangeOperators = ['<', '<=', '>', '>='];
+    const rangeFilters: Filter<T>[] = [];
+    if (filter) filter.forEach((data: Filter<T>) => {
+      if(rangeOperators.includes(data[1])) {
+        rangeFilters.push(data);
+      } else {
         call = call.where(...data);
-        return call;
-      });
-      if (limit) call = call.limit(limit)
+      }
+    });
+    if (limit) call = call.limit(limit)
+    if(rangeFilters.length >= 1) {
+      const eachRangeResult = rangeFilters.map((filter): Promise<Result<T>[]> => {
+        const newCall = call.where(...filter);
+        return this.executeQuery(newCall)
+      })
+      const resolvedRangeResults = await Promise.all(eachRangeResult);
+      const notRangedCall = await this.executeQuery(call);
+      return _.intersectionWith(...resolvedRangeResults, notRangedCall, _.isEqual);
+    } else {
+      return await this.executeQuery(call);
+    }
+  }
+
+
+  private executeQuery(call: DocumentData): Promise<Result<T>[]> {
+    return new Promise((resolve, reject) => {
       call
         .get()
         .then((querySnapshot: QuerySnapshot) => {
           const results: Result<T>[] = [];
-          querySnapshot.forEach((doc: QueryDocumentSnapshot) =>
-            results.push(<Result<T>>{ _id: doc.id, ...doc.data() })
+          querySnapshot.forEach((doc: QueryDocumentSnapshot) => results.push(<Result<T>>{ _id: doc.id, ...doc.data() })
           );
           resolve(results);
         })
         .catch((err: any) => {
           if (err) {
-            console.error(err)
-            reject(Error(err))
+            console.error(err);
+            reject(Error(err));
           } else {
             reject(Error('Internal server error !'));
           }
         });
     });
   }
-
 
   /**
    * Gets first document according to filtering.

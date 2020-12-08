@@ -28,7 +28,7 @@ export const listCall = functions.https.onRequest(async (request, response) => {
   try {
 
     const where:Filter<BikeSchema>[] = [
-      ['BRAND', '==', 'Ducati'], 
+      ['BRAND', '==', 'Ducati'],
       ['HORSE_POWER', '>=', 70]
     ]
     const ducati:Result<BikeSchema>[] = await bike.listDocs(where)
@@ -46,18 +46,35 @@ export const listIn = functions.https.onRequest(async (request, response) => {
   try {
 
     let where:Filter<BikeSchema>[] = [
-      ['BRAND', '==', 'Ducati'], 
+      ['BRAND', '==', 'Ducati'],
       ['CATEGORY', 'array-contains', 'race']
     ]
     const race:Result<BikeSchema>[] = await bike.listDocs(where)
 
     where = [
-      ['BRAND', '==', 'Ducati'], 
+      ['BRAND', '==', 'Ducati'],
       ['MODEL', 'in', ['797', '821']]
     ]
     const ducati_797_821:Result<BikeSchema>[] = await bike.listDocs(where)
 
     response.send({race, ducati_797_821})
+
+  } catch(err) {
+    response.send(err)
+  }
+});
+
+export const listRange = functions.https.onRequest(async (request, response) => {
+  functions.logger.info("rangeTest", {structuredData: true});
+  try {
+
+    let where:Filter<BikeSchema>[] = [
+      ['HORSE_POWER', '>', 99],
+      ['PRICE', '<', 1501]
+    ]
+    const race:Result<BikeSchema>[] = await bike.listDocs(where)
+
+    response.send({race})
 
   } catch(err) {
     response.send(err)
