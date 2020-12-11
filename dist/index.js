@@ -25,7 +25,7 @@ class Onfirework {
      * Add a new document to this collection with the specified data.
      *
      * If the DocumentReference is not passed it will be created automatically.
-     * @param {*} data
+     * @param {Partial<T>} data
      * @param {string} [id]
      * @return {*}  {Promise<void>}
      * @memberof Onfirework

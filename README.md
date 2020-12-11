@@ -46,7 +46,7 @@ async function listBikes() {
 
 ## Available methods
 
-##### ```createDoc(data: Inreface, id?: DocumentReference): Promise<void>```
+##### ```createDoc(data: Partial<Inreface>, id?: DocumentReference): Promise<void>```
 Add a new document to this collection with the specified data.
 
 If the DocumentReference is not passed it will be created automatically.
