@@ -162,8 +162,11 @@ export class Onfirework<T> {
    */
   deleteDocs(filter?: Filter<T>[]): Promise<void> {
     return new Promise((resolve, reject) => {
-      const call:DocumentData = this.db.collection(this.collection);
-      if (filter) filter.map((data: Filter<T>) => call.where(...data));
+      let call:DocumentData = this.db.collection(this.collection);
+      if (filter) filter.map((data: Filter<T>) => {
+        call = call.where(...data);
+        return call;
+      });
       call
         .get()
         .then((querySnapshot: QuerySnapshot) => {
