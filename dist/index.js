@@ -153,9 +153,12 @@ class Onfirework {
      */
     deleteDocs(filter) {
         return new Promise((resolve, reject) => {
-            const call = this.db.collection(this.collection);
+            let call = this.db.collection(this.collection);
             if (filter)
-                filter.map((data) => call.where(...data));
+                filter.map((data) => {
+                    call = call.where(...data);
+                    return call;
+                });
             call
                 .get()
                 .then((querySnapshot) => {
