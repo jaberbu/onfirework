@@ -49,6 +49,15 @@ export declare class Onfirework<T> {
      */
     updateDoc(id: string, updateData: Partial<T>): Promise<void>;
     /**
+     * Update documents according to filtering.
+     * @param {Filter<T>[]} filter
+     * @param {Partial<T>} updateData
+     * @return {*}  {Promise<void>}
+     * @memberof Onfirework
+     * @see https://firebase.google.com/docs/firestore/query-data/queries
+     */
+    updateDocs(filter: Filter<T>[], updateData: Partial<T>): Promise<void>;
+    /**
      * Deletes the document referred to by this DocumentReference.
      * @param {string} id
      * @return {*}  {Promise<void>}

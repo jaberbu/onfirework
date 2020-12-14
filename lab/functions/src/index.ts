@@ -92,6 +92,17 @@ export const deleteCall = functions.https.onRequest((request, response) => {
 });
 
 
+export const updateCall = functions.https.onRequest((request, response) => {
+  functions.logger.info("updateCall", {structuredData: true});
+  try {
+    bike.updateDocs([['MODEL', '==', '797']], {'COLOR': 'RED'})
+    .then(() => response.send('Updated !')).catch(err => response.send(err))
+  } catch(err) {
+    response.send(err)
+  }
+});
+
+
 export const helloWorld = functions.https.onRequest((request, response) => {
   functions.logger.info("helloWorld", {structuredData: true});
   response.send("Hello from Firebase!");
