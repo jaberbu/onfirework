@@ -1,6 +1,6 @@
 {
   "name": "onfirework",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Firebase for dummies. Easiest way to work with Cloud Firestore",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
