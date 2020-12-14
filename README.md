@@ -62,6 +62,10 @@ Updates fields in the document referred to by this DocumentReference.
 The update will fail if applied to a document that does not exist.
 
 
+##### ```updateDocs(filter: [FieldPath, WhereFilterOp, any][], data: Partial<Inreface>): Promise<void>```
+Update documents according to filtering.
+
+
 ##### ```deleteDoc(id: DocumentReference): Promise<void>```
 Deletes the document referred to by this DocumentReference.
 

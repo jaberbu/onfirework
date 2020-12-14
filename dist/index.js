@@ -121,6 +121,39 @@ class Onfirework {
         });
     }
     /**
+     * Update documents according to filtering.
+     * @param {Filter<T>[]} filter
+     * @param {Partial<T>} updateData
+     * @return {*}  {Promise<void>}
+     * @memberof Onfirework
+     * @see https://firebase.google.com/docs/firestore/query-data/queries
+     */
+    updateDocs(filter, updateData) {
+        return new Promise((resolve, reject) => {
+            let call = this.db.collection(this.collection);
+            if (filter)
+                filter.map((data) => {
+                    call = call.where(...data);
+                    return call;
+                });
+            call
+                .get()
+                .then((querySnapshot) => {
+                querySnapshot.forEach((doc) => doc.ref.update(updateData));
+                resolve();
+            })
+                .catch((err) => {
+                if (err) {
+                    console.error(err);
+                    reject(Error(err));
+                }
+                else {
+                    reject(Error('Internal server error !'));
+                }
+            });
+        });
+    }
+    /**
      * Deletes the document referred to by this DocumentReference.
      * @param {string} id
      * @return {*}  {Promise<void>}

@@ -128,6 +128,38 @@ export class Onfirework<T> {
         });
     });
   }
+  
+  /**
+   * Update documents according to filtering.
+   * @param {Filter<T>[]} filter
+   * @param {Partial<T>} updateData
+   * @return {*}  {Promise<void>}
+   * @memberof Onfirework
+   * @see https://firebase.google.com/docs/firestore/query-data/queries
+   */
+  updateDocs(filter: Filter<T>[], updateData: Partial<T>): Promise<void> {
+    return new Promise((resolve, reject) => {
+      let call:DocumentData = this.db.collection(this.collection);
+      if (filter) filter.map((data: Filter<T>) => {
+        call = call.where(...data);
+        return call;
+      });
+      call
+        .get()
+        .then((querySnapshot: QuerySnapshot) => {
+          querySnapshot.forEach((doc: QueryDocumentSnapshot) => doc.ref.update(updateData));
+          resolve();
+        })
+        .catch((err: any) => {
+          if (err) {
+            console.error(err)
+            reject(Error(err))
+          } else {
+            reject(Error('Internal server error !'));
+          }
+        });
+    });
+  }
 
   /**
    * Deletes the document referred to by this DocumentReference.
