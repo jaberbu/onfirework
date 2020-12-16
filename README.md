@@ -46,7 +46,7 @@ async function listBikes() {
 
 ## Available methods
 
-##### ```createDoc(data: Inreface, id?: DocumentReference): Promise<void>```
+##### ```createDoc(data: Partial<Inreface>, id?: DocumentReference): Promise<void>```
 Add a new document to this collection with the specified data.
 
 If the DocumentReference is not passed it will be created automatically.
@@ -60,6 +60,10 @@ Read the document referred to by this DocumentReference.
 Updates fields in the document referred to by this DocumentReference.
 
 The update will fail if applied to a document that does not exist.
+
+
+##### ```updateDocs(filter: [FieldPath, WhereFilterOp, any][], data: Partial<Inreface>): Promise<void>```
+Update documents according to filtering.
 
 
 ##### ```deleteDoc(id: DocumentReference): Promise<void>```
