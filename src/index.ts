@@ -259,7 +259,8 @@ export class Onfirework<T> {
         .get()
         .then((querySnapshot: QuerySnapshot) => {
           const results: Result<T>[] = [];
-          querySnapshot.forEach((doc: QueryDocumentSnapshot) => results.push(<Result<T>>{ _id: doc.id, ...doc.data() })
+          querySnapshot.forEach((doc: QueryDocumentSnapshot) => 
+            results.push(<Result<T>>{ _id: doc.id, ...doc.data() })
           );
           resolve(results);
         })
