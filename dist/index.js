@@ -26,7 +26,7 @@ class Onfirework {
      * Add a new document to this collection with the specified data.
      *
      * If the DocumentReference is not passed it will be created automatically.
-     * @param {*} data
+     * @param {Partial<T>} data
      * @param {string} [id]
      * @return {*}  {Promise<void>}
      * @memberof Onfirework
@@ -122,6 +122,39 @@ class Onfirework {
         });
     }
     /**
+     * Update documents according to filtering.
+     * @param {Filter<T>[]} filter
+     * @param {Partial<T>} updateData
+     * @return {*}  {Promise<void>}
+     * @memberof Onfirework
+     * @see https://firebase.google.com/docs/firestore/query-data/queries
+     */
+    updateDocs(filter, updateData) {
+        return new Promise((resolve, reject) => {
+            let call = this.db.collection(this.collection);
+            if (filter)
+                filter.map((data) => {
+                    call = call.where(...data);
+                    return call;
+                });
+            call
+                .get()
+                .then((querySnapshot) => {
+                querySnapshot.forEach((doc) => doc.ref.update(updateData));
+                resolve();
+            })
+                .catch((err) => {
+                if (err) {
+                    console.error(err);
+                    reject(Error(err));
+                }
+                else {
+                    reject(Error('Internal server error !'));
+                }
+            });
+        });
+    }
+    /**
      * Deletes the document referred to by this DocumentReference.
      * @param {string} id
      * @return {*}  {Promise<void>}
@@ -154,9 +187,12 @@ class Onfirework {
      */
     deleteDocs(filter) {
         return new Promise((resolve, reject) => {
-            const call = this.db.collection(this.collection);
+            let call = this.db.collection(this.collection);
             if (filter)
-                filter.map((data) => call.where(...data));
+                filter.map((data) => {
+                    call = call.where(...data);
+                    return call;
+                });
             call
                 .get()
                 .then((querySnapshot) => {

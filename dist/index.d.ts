@@ -25,12 +25,12 @@ export declare class Onfirework<T> {
      * Add a new document to this collection with the specified data.
      *
      * If the DocumentReference is not passed it will be created automatically.
-     * @param {*} data
+     * @param {Partial<T>} data
      * @param {string} [id]
      * @return {*}  {Promise<void>}
      * @memberof Onfirework
      */
-    createDoc(data: T, id?: string): Promise<void>;
+    createDoc(data: Partial<T>, id?: string): Promise<void>;
     /**
      * Reads the document referred to by this DocumentReference.
      * @param {string} id
@@ -48,6 +48,15 @@ export declare class Onfirework<T> {
      * @memberof Onfirework
      */
     updateDoc(id: string, updateData: Partial<T>): Promise<void>;
+    /**
+     * Update documents according to filtering.
+     * @param {Filter<T>[]} filter
+     * @param {Partial<T>} updateData
+     * @return {*}  {Promise<void>}
+     * @memberof Onfirework
+     * @see https://firebase.google.com/docs/firestore/query-data/queries
+     */
+    updateDocs(filter: Filter<T>[], updateData: Partial<T>): Promise<void>;
     /**
      * Deletes the document referred to by this DocumentReference.
      * @param {string} id

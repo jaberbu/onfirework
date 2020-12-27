@@ -2,16 +2,26 @@ interface Schema {
   BRAND: string,
   MODEL: string,
 	HORSE_POWER: number,
-  CATEGORY: string[],
-  PRICE: number
+	COLOR: string,
+	CATEGORY: string[],
 }
 
 let initial_data:Array<Schema> = [
 	{
 		'BRAND': 'Ducati',
 		'MODEL': '797',
-    'HORSE_POWER': 75,
-    'PRICE': 1000,
+		'HORSE_POWER': 75,
+		'COLOR': 'white',
+		'CATEGORY': [
+			'naked',
+			'urban'
+		]
+	},
+	{
+		'BRAND': 'Ducati',
+		'MODEL': '797',
+		'HORSE_POWER': 75,
+		'COLOR': 'dark',
 		'CATEGORY': [
 			'naked',
 			'urban'
@@ -20,8 +30,8 @@ let initial_data:Array<Schema> = [
 	{
 		'BRAND': 'Ducati',
 		'MODEL': '821',
-    'HORSE_POWER': 100,
-    'PRICE': 1500,
+		'HORSE_POWER': 100,
+		'COLOR': 'dark',
 		'CATEGORY': [
 			'naked',
 			'race'
@@ -30,8 +40,8 @@ let initial_data:Array<Schema> = [
 	{
 		'BRAND': 'Suzuki',
 		'MODEL': 'GSX-R',
-    'HORSE_POWER': 150,
-    'PRICE': 2000,
+		'HORSE_POWER': 150,
+		'COLOR': 'blue',
 		'CATEGORY': [
 			'race'
 		]
