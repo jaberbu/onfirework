@@ -129,7 +129,7 @@ export class Onfirework<T> {
         });
     });
   }
-  
+
   /**
    * Update documents according to filtering.
    * @param {Filter<T>[]} filter
@@ -238,7 +238,6 @@ export class Onfirework<T> {
         call = call.where(...data);
       }
     });
-    if (limit) call = call.limit(limit)
     if(rangeFilters.length >= 1) {
       const eachRangeResult = rangeFilters.map((filter): Promise<Result<T>[]> => {
         const newCall = call.where(...filter);
@@ -246,8 +245,10 @@ export class Onfirework<T> {
       })
       const resolvedRangeResults = await Promise.all(eachRangeResult);
       const notRangedCall = await this.executeQuery(call);
-      return _.intersectionWith(...resolvedRangeResults, notRangedCall, _.isEqual);
+      const resultIntersection = _.intersectionWith(...resolvedRangeResults, notRangedCall, _.isEqual);
+      return limit ? _.take(resultIntersection, limit) : resultIntersection;
     } else {
+      if (limit) call = call.limit(limit)
       return await this.executeQuery(call);
     }
   }
@@ -259,7 +260,7 @@ export class Onfirework<T> {
         .get()
         .then((querySnapshot: QuerySnapshot) => {
           const results: Result<T>[] = [];
-          querySnapshot.forEach((doc: QueryDocumentSnapshot) => 
+          querySnapshot.forEach((doc: QueryDocumentSnapshot) =>
             results.push(<Result<T>>{ _id: doc.id, ...doc.data() })
           );
           resolve(results);

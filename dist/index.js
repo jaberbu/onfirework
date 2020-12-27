@@ -233,8 +233,6 @@ class Onfirework {
                     call = call.where(...data);
                 }
             });
-        if (limit)
-            call = call.limit(limit);
         if (rangeFilters.length >= 1) {
             const eachRangeResult = rangeFilters.map((filter) => {
                 const newCall = call.where(...filter);
@@ -242,9 +240,12 @@ class Onfirework {
             });
             const resolvedRangeResults = await Promise.all(eachRangeResult);
             const notRangedCall = await this.executeQuery(call);
-            return _.intersectionWith(...resolvedRangeResults, notRangedCall, _.isEqual);
+            const resultIntersection = _.intersectionWith(...resolvedRangeResults, notRangedCall, _.isEqual);
+            return limit ? _.take(resultIntersection, limit) : resultIntersection;
         }
         else {
+            if (limit)
+                call = call.limit(limit);
             return await this.executeQuery(call);
         }
     }

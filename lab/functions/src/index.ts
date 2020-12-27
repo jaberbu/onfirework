@@ -81,6 +81,25 @@ export const listRange = functions.https.onRequest(async (request, response) => 
   }
 });
 
+export const listLimitedRange = functions.https.onRequest(async (request, response) => {
+  functions.logger.info("limited range test", {structuredData: true});
+  try {
+
+    let where:Filter<BikeSchema>[] = [
+      ['HORSE_POWER', '<', 101],
+      ['PRICE', '>', 999],
+    ]
+
+    const limit = parseInt(request.query.limit as string, 10) ??  undefined
+    const race:Result<BikeSchema>[] = await bike.listDocs(where, limit)
+
+    response.send(race)
+
+  } catch(err) {
+    response.send(err)
+  }
+});
+
 
 export const listFirst = functions.https.onRequest(async (request, response) => {
   functions.logger.info("listFirst", {structuredData: true});
