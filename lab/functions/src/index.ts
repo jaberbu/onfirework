@@ -70,11 +70,11 @@ export const listRange = functions.https.onRequest(async (request, response) => 
 
     let where:Filter<BikeSchema>[] = [
       ['HORSE_POWER', '>', 99],
-      ['PRICE', '<', 1501]
+      ['PRICE', '<', 2000]
     ]
     const race:Result<BikeSchema>[] = await bike.listDocs(where)
 
-    response.send({race})
+    response.send(race)
 
   } catch(err) {
     response.send(err)
