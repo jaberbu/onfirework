@@ -20,9 +20,12 @@ import * as firebase from 'firebase-admin';
 import { Onfirework, Filter, Result } from 'onfirework';
 
 interface BikeSchema {
-  BRAND: String;
-  MODEL: String;
-  HORSE_POWER: Number;
+  BRAND: string,
+  MODEL: string,
+  COLOR: string,
+  HORSE_POWER: number,
+  CATEGORY: string[],
+  PRICE: number
 }
 
 firebase.initializeApp();
@@ -31,12 +34,14 @@ let db = firebase.firestore();
 const bikes = new Onfirework<BikeSchema>(db, 'BIKES')
 
 /**
- * Select all docs from BIKES collection where BRAND is Ducati and HORSE_POWER greater or equal to 70
+ * Select all docs from BIKES collection where BRAND is Ducati and HORSE_POWER greater or equal to 70 and PRICE greater to 8000
  */
 async function listBikes() {
   
   const where:Filter<BikeSchema>[] = [
-    ['BRAND', '==', 'Ducati'], ['HORSE_POWER', '>=', 70]
+    ['BRAND', '==', 'Ducati'], 
+    ['HORSE_POWER', '>=', 70],
+    ['PRICE', '>', 8000]
   ]
   const ducati:Result<BikeSchema>[] = await bikes.listDocs(where)
 
@@ -96,8 +101,6 @@ SELECT * FROM foo WHERE foo.BRAND = 'Ducati' AND foo.COLOR = 'White' LIMIT 2
 
 foo.listDocs([['BRAND', '==', 'Ducati'], ['COLOR', '==', 'White']], 2)
 ```
-Keep in mind Firebase [Query limitations](https://firebase.google.com/docs/firestore/query-data/queries#query_limitations)
-
 
 ##### ```listFirst(filter?: [FieldPath, WhereFilterOp, any][]): Promise<Result<Interface>>```
 Gets first document according to filtering.

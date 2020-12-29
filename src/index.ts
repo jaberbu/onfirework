@@ -51,7 +51,7 @@ export class Onfirework<T> {
           .collection(this.collection)
           .add(data)
           .then(() => resolve())
-          .catch((err: any) => {
+          .catch((err: string | undefined) => {
             if(err) {console.error(err)}
             reject(new Error('Internal Servicer Error !'))
           });
@@ -61,7 +61,7 @@ export class Onfirework<T> {
           .doc(id)
           .set(data)
           .then(() => resolve())
-          .catch((err: any) => {
+          .catch((err: string | undefined) => {
             if (err) {
               console.error(err)
               reject(Error(err))
@@ -92,7 +92,7 @@ export class Onfirework<T> {
             throw new Error('Document not found')
           }
         })
-        .catch((err: any) => {
+        .catch((err: string | undefined) => {
           if (err) {
             console.error(err)
             reject(Error(err))
@@ -119,7 +119,7 @@ export class Onfirework<T> {
         .doc(id)
         .update(updateData)
         .then(() => resolve())
-        .catch((err: any) => {
+        .catch((err: string | undefined) => {
           if (err) {
             console.error(err)
             reject(Error(err))
@@ -140,25 +140,20 @@ export class Onfirework<T> {
    */
   updateDocs(filter: Filter<T>[], updateData: Partial<T>): Promise<void> {
     return new Promise((resolve, reject) => {
-      let call:DocumentData = this.db.collection(this.collection);
-      if (filter) filter.map((data: Filter<T>) => {
-        call = call.where(...data);
-        return call;
+      const call:DocumentData = this.db.collection(this.collection);
+      this.listDocs(filter)
+      .then(async (docs:Result<T>[]) => {
+        await Promise.all(docs.map((doc:Result<T>) => call.doc(doc._id).update(updateData)));
+        resolve();
+      })
+      .catch((err: string | undefined) => {
+        if (err) {
+          console.error(err)
+          reject(Error(err))
+        } else {
+          reject(Error('Internal server error !'));
+        }
       });
-      call
-        .get()
-        .then((querySnapshot: QuerySnapshot) => {
-          querySnapshot.forEach((doc: QueryDocumentSnapshot) => doc.ref.update(updateData));
-          resolve();
-        })
-        .catch((err: any) => {
-          if (err) {
-            console.error(err)
-            reject(Error(err))
-          } else {
-            reject(Error('Internal server error !'));
-          }
-        });
     });
   }
 
@@ -175,7 +170,7 @@ export class Onfirework<T> {
         .doc(id)
         .delete()
         .then(() => resolve())
-        .catch((err: any) => {
+        .catch((err: string | undefined) => {
           if (err) {
             console.error(err)
             reject(Error(err))
@@ -195,25 +190,45 @@ export class Onfirework<T> {
    */
   deleteDocs(filter?: Filter<T>[]): Promise<void> {
     return new Promise((resolve, reject) => {
-      let call:DocumentData = this.db.collection(this.collection);
-      if (filter) filter.map((data: Filter<T>) => {
-        call = call.where(...data);
-        return call;
+      const call:DocumentData = this.db.collection(this.collection);
+      this.listDocs(filter)
+      .then(async (docs:Result<T>[]) => {
+        await Promise.all(docs.map((doc:Result<T>) => call.doc(doc._id).delete()));
+        resolve();
+      })
+      .catch((err: string | undefined) => {
+        if (err) {
+          console.error(err)
+          reject(Error(err))
+        } else {
+          reject(Error('Internal server error !'));
+        }
       });
-      call
-        .get()
-        .then((querySnapshot: QuerySnapshot) => {
-          querySnapshot.forEach((doc: QueryDocumentSnapshot) => doc.ref.delete());
-          resolve();
-        })
-        .catch((err: any) => {
-          if (err) {
-            console.error(err)
-            reject(Error(err))
-          } else {
-            reject(Error('Internal server error !'));
-          }
-        });
+    });
+  }
+
+  /**
+   * Gets first document according to filtering.
+   *
+   * @param {Filter<T>[]} [filter]
+   * @return {*}  {Promise<Result<T>>}
+   * @memberof Onfirework
+   * @see https://firebase.google.com/docs/firestore/query-data/queries
+   */
+  listFirst(filter?: Filter<T>[]): Promise<Result<T>> {
+    return new Promise((resolve, reject) => {
+      this.listDocs(filter)
+      .then((docs:Result<T>[]) => {
+        resolve(docs[0]);
+      })
+      .catch((err: string | undefined) => {
+        if (err) {
+          console.error(err)
+          reject(Error(err))
+        } else {
+          reject(Error('Internal server error !'));
+        }
+      });
     });
   }
 
@@ -232,13 +247,13 @@ export class Onfirework<T> {
     const rangeOperators = ['<', '<=', '>', '>='];
     const rangeFilters: Filter<T>[] = [];
     if (filter) filter.forEach((data: Filter<T>) => {
-      if(rangeOperators.includes(data[1])) {
+      if (rangeOperators.includes(data[1])) {
         rangeFilters.push(data);
       } else {
         call = call.where(...data);
       }
     });
-    if(rangeFilters.length >= 1) {
+    if (rangeFilters.length >= 1) {
       const eachRangeResult = rangeFilters.map((filter): Promise<Result<T>[]> => {
         const newCall = call.where(...filter);
         return this.executeQuery(newCall)
@@ -246,14 +261,21 @@ export class Onfirework<T> {
       const resolvedRangeResults = await Promise.all(eachRangeResult);
       const notRangedCall = await this.executeQuery(call);
       const resultIntersection = _.intersectionWith(...resolvedRangeResults, notRangedCall, _.isEqual);
-      return limit ? _.take(resultIntersection, limit) : resultIntersection;
+      return limit ? _.take(resultIntersection, limit) : resultIntersection
     } else {
       if (limit) call = call.limit(limit)
-      return await this.executeQuery(call);
+      return this.executeQuery(call);
     }
   }
 
-
+  /**
+   * Query execution
+   *
+   * @private
+   * @param {DocumentData} call
+   * @return {*}  {Promise<Result<T>[]>}
+   * @memberof Onfirework
+   */
   private executeQuery(call: DocumentData): Promise<Result<T>[]> {
     return new Promise((resolve, reject) => {
       call
@@ -265,45 +287,10 @@ export class Onfirework<T> {
           );
           resolve(results);
         })
-        .catch((err: any) => {
+        .catch((err: string | undefined) => {
           if (err) {
             console.error(err);
             reject(Error(err));
-          } else {
-            reject(Error('Internal server error !'));
-          }
-        });
-    });
-  }
-
-  /**
-   * Gets first document according to filtering.
-   *
-   * @param {Filter<T>[]} [filter]
-   * @return {*}  {Promise<Result<T>>}
-   * @memberof Onfirework
-   * @see https://firebase.google.com/docs/firestore/query-data/queries
-   */
-  listFirst(filter?: Filter<T>[]): Promise<Result<T>> {
-    return new Promise((resolve, reject) => {
-      let call:DocumentData = this.db.collection(this.collection);
-      if (filter) filter.map((data: Filter<T>) => {
-        call = call.where(...data);
-        return call;
-      });
-      call.limit(1)
-        .get()
-        .then((querySnapshot: QuerySnapshot) => {
-          const results: Result<T>[] = [];
-          querySnapshot.forEach((doc: QueryDocumentSnapshot) =>
-            results.push(<Result<T>>{ _id: doc.id, ...doc.data() })
-          );
-          resolve(results[0]);
-        })
-        .catch((err: any) => {
-          if (err) {
-            console.error(err)
-            reject(Error(err))
           } else {
             reject(Error('Internal server error !'));
           }

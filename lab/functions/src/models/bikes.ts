@@ -1,10 +1,10 @@
 interface Schema {
-  BRAND: string,
+	BRAND: string,
 	MODEL: string,
 	COLOR: string,
 	HORSE_POWER: number,
-  CATEGORY: string[],
-  PRICE: number
+	CATEGORY: string[],
+	PRICE: number
 }
 
 let initial_data:Array<Schema> = [
