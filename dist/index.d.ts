@@ -73,6 +73,15 @@ export declare class Onfirework<T> {
      */
     deleteDocs(filter?: Filter<T>[]): Promise<void>;
     /**
+     * Gets first document according to filtering.
+     *
+     * @param {Filter<T>[]} [filter]
+     * @return {*}  {Promise<Result<T>>}
+     * @memberof Onfirework
+     * @see https://firebase.google.com/docs/firestore/query-data/queries
+     */
+    listFirst(filter?: Filter<T>[]): Promise<Result<T>>;
+    /**
      * Reads documents according to filtering.
      *
      * If the filter is not passed, it will show all documents.
@@ -83,14 +92,13 @@ export declare class Onfirework<T> {
      * @see https://firebase.google.com/docs/firestore/query-data/queries
      */
     listDocs(filter?: Filter<T>[], limit?: number): Promise<Result<T>[]>;
-    private executeQuery;
     /**
-     * Gets first document according to filtering.
+     * Query execution
      *
-     * @param {Filter<T>[]} [filter]
-     * @return {*}  {Promise<Result<T>>}
+     * @private
+     * @param {DocumentData} call
+     * @return {*}  {Promise<Result<T>[]>}
      * @memberof Onfirework
-     * @see https://firebase.google.com/docs/firestore/query-data/queries
      */
-    listFirst(filter?: Filter<T>[]): Promise<Result<T>>;
+    private executeQuery;
 }
