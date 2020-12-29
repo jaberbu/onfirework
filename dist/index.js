@@ -2,6 +2,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Onfirework = void 0;
+const _ = require("lodash");
 /**
  * Makes Firebase easier!
  *
@@ -219,16 +220,37 @@ class Onfirework {
      * @memberof Onfirework
      * @see https://firebase.google.com/docs/firestore/query-data/queries
      */
-    listDocs(filter, limit) {
-        return new Promise((resolve, reject) => {
-            let call = this.db.collection(this.collection);
-            if (filter)
-                filter.map((data) => {
+    async listDocs(filter, limit) {
+        let call = this.db.collection(this.collection);
+        const rangeOperators = ['<', '<=', '>', '>='];
+        const rangeFilters = [];
+        if (filter)
+            filter.forEach((data) => {
+                if (rangeOperators.includes(data[1])) {
+                    rangeFilters.push(data);
+                }
+                else {
                     call = call.where(...data);
-                    return call;
-                });
+                }
+            });
+        if (rangeFilters.length >= 1) {
+            const eachRangeResult = rangeFilters.map((filter) => {
+                const newCall = call.where(...filter);
+                return this.executeQuery(newCall);
+            });
+            const resolvedRangeResults = await Promise.all(eachRangeResult);
+            const notRangedCall = await this.executeQuery(call);
+            const resultIntersection = _.intersectionWith(...resolvedRangeResults, notRangedCall, _.isEqual);
+            return limit ? _.take(resultIntersection, limit) : resultIntersection;
+        }
+        else {
             if (limit)
                 call = call.limit(limit);
+            return await this.executeQuery(call);
+        }
+    }
+    executeQuery(call) {
+        return new Promise((resolve, reject) => {
             call
                 .get()
                 .then((querySnapshot) => {
