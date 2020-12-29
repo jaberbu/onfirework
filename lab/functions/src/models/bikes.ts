@@ -13,7 +13,7 @@ let initial_data:Array<Schema> = [
 		'MODEL': '797',
 		'HORSE_POWER': 75,
 		'COLOR': 'WHITE',
-    'PRICE': 1000,
+		'PRICE': 1000,
 		'CATEGORY': [
 			'naked',
 			'urban'
@@ -24,7 +24,7 @@ let initial_data:Array<Schema> = [
 		'MODEL': '821',
 		'HORSE_POWER': 100,
 		'COLOR': 'DARK',
-    'PRICE': 1500,
+		'PRICE': 1500,
 		'CATEGORY': [
 			'naked',
 			'race'
@@ -35,7 +35,7 @@ let initial_data:Array<Schema> = [
 		'MODEL': 'GSX-R',
 		'HORSE_POWER': 150,
 		'COLOR': 'BLUE',
-    'PRICE': 2000,
+		'PRICE': 2000,
 		'CATEGORY': [
 			'race'
 		]

@@ -12,28 +12,16 @@ let db = admin.firestore();
 
 const bike = new Onfirework<BikeSchema>(db, 'BIKES');
 
-export const loadInitData = functions.https.onRequest((request, response) => {
-  functions.logger.info("LoadInitData", {structuredData: true});
+
+export const createDocs = functions.https.onRequest(async (request, response) => {
+  functions.logger.info("createDocs", {structuredData: true});
   try {
-    bikes_data.map((data:BikeSchema) => bike.createDoc(data))
-    response.send('LoadInitData: DONE!')
-  } catch(err) {
-    response.send(err)
-  }
-});
+    const datas = (request.body.length) ? request.body : bikes_data;
 
-
-export const listCall = functions.https.onRequest(async (request, response) => {
-  functions.logger.info("listCall", {structuredData: true});
-  try {
-
-    const where:Filter<BikeSchema>[] = [
-      ['BRAND', '==', 'Ducati'],
-      ['HORSE_POWER', '>=', 70]
-    ]
-    const ducati:Result<BikeSchema>[] = await bike.listDocs(where)
-
-    response.send(ducati)
+    datas.map((data:BikeSchema) => bike.createDoc(data))
+    
+    const result:Result<BikeSchema>[] = await bike.listDocs()
+    response.send(result)
 
   } catch(err) {
     response.send(err)
@@ -41,60 +29,15 @@ export const listCall = functions.https.onRequest(async (request, response) => {
 });
 
 
-export const listIn = functions.https.onRequest(async (request, response) => {
-  functions.logger.info("listCall", {structuredData: true});
+export const listDocs = functions.https.onRequest(async (request, response) => {
+  functions.logger.info("listDocs", {structuredData: true});
   try {
 
-    let where:Filter<BikeSchema>[] = [
-      ['BRAND', '==', 'Ducati'],
-      ['CATEGORY', 'array-contains', 'race']
-    ]
-    const race:Result<BikeSchema>[] = await bike.listDocs(where)
+    const limit = parseInt(request.query.limit as string, 10) ?? undefined
+    const where:Filter<BikeSchema>[] = (request.body.length) ? request.body : [];
 
-    where = [
-      ['BRAND', '==', 'Ducati'],
-      ['MODEL', 'in', ['797', '821']]
-    ]
-    const ducati_797_821:Result<BikeSchema>[] = await bike.listDocs(where)
-
-    response.send({race, ducati_797_821})
-
-  } catch(err) {
-    response.send(err)
-  }
-});
-
-export const listRange = functions.https.onRequest(async (request, response) => {
-  functions.logger.info("rangeTest", {structuredData: true});
-  try {
-
-    let where:Filter<BikeSchema>[] = [
-      ['HORSE_POWER', '>', 99],
-      ['PRICE', '<', 2000]
-    ]
-    const race:Result<BikeSchema>[] = await bike.listDocs(where)
-
-    response.send(race)
-
-  } catch(err) {
-    response.send(err)
-  }
-});
-
-export const listLimitedRange = functions.https.onRequest(async (request, response) => {
-  functions.logger.info("limited range test", {structuredData: true});
-  try {
-
-    let where:Filter<BikeSchema>[] = [
-      ['HORSE_POWER', '<', 101],
-      ['PRICE', '>', 999],
-    ]
-
-    const limit = parseInt(request.query.limit as string, 10) ??  undefined
-    const race:Result<BikeSchema>[] = await bike.listDocs(where, limit)
-
-    response.send(race)
-
+    const result:Result<BikeSchema>[] = await bike.listDocs(where, limit)
+    response.send(result)
   } catch(err) {
     response.send(err)
   }
@@ -104,11 +47,11 @@ export const listLimitedRange = functions.https.onRequest(async (request, respon
 export const listFirst = functions.https.onRequest(async (request, response) => {
   functions.logger.info("listFirst", {structuredData: true});
   try {
+  
+    const where:Filter<BikeSchema>[] = (request.body.length) ? request.body : [];
+    const result:Result<BikeSchema> = await bike.listFirst(where)
 
-    const where:Filter<BikeSchema>[] = [['BRAND', '==', 'Ducati'], ['MODEL', '==', '797']]
-    const ducati:Result<BikeSchema> = await bike.listFirst(where)
-
-    response.send(ducati || 'No Brand')
+    response.send(result)
 
   } catch(err) {
     response.send(err)
@@ -116,30 +59,30 @@ export const listFirst = functions.https.onRequest(async (request, response) => 
 });
 
 
-export const deleteCall = functions.https.onRequest((request, response) => {
-  functions.logger.info("deleteCall", {structuredData: true});
+export const deleteDocs = functions.https.onRequest((request, response) => {
+  functions.logger.info("deleteDocs", {structuredData: true});
   try {
-    bike
-    .deleteDocs([['HORSE_POWER', '>', 150]])
-    .then(() => response.send('Deleted !')).catch(err => response.send(err))
+    const where:Filter<BikeSchema>[] = (request.body.length) ? request.body : [];
+    bike.deleteDocs(where)
+    .then(() => response.send('Deleted !'))
+    .catch(err => response.send(err))
   } catch(err) {
     response.send(err)
   }
 });
 
 
-export const updateCall = functions.https.onRequest((request, response) => {
-  functions.logger.info("updateCall", {structuredData: true});
+export const updateDocs = functions.https.onRequest(async (request, response) => {
+  functions.logger.info("updateDocs", {structuredData: true});
   try {
-    bike.updateDocs([['MODEL', '==', '797']], {'COLOR': 'RED'})
-    .then(() => response.send('Updated !')).catch(err => response.send(err))
+    const where:Filter<BikeSchema>[] = (request.body.where.length) ? request.body.where : [];
+    const updateData:Partial<BikeSchema> = request.body.update;
+
+    await bike.updateDocs(where, updateData)
+
+    const result:Result<BikeSchema>[] = await bike.listDocs(where)
+    response.send(result)
   } catch(err) {
     response.send(err)
   }
-});
-
-
-export const helloWorld = functions.https.onRequest((request, response) => {
-  functions.logger.info("helloWorld", {structuredData: true});
-  response.send("Hello from Firebase!");
 });
