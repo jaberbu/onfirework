@@ -1,4 +1,4 @@
-# Firebase for dummies [BETA].
+# Firebase for dummies.
 
 [![npm][npm-image]][npm-url]
 

@@ -131,16 +131,10 @@ class Onfirework {
      */
     updateDocs(filter, updateData) {
         return new Promise((resolve, reject) => {
-            let call = this.db.collection(this.collection);
-            if (filter)
-                filter.map((data) => {
-                    call = call.where(...data);
-                    return call;
-                });
-            call
-                .get()
-                .then((querySnapshot) => {
-                querySnapshot.forEach((doc) => doc.ref.update(updateData));
+            const call = this.db.collection(this.collection);
+            this.listDocs(filter)
+                .then(async (docs) => {
+                await Promise.all(docs.map((doc) => call.doc(doc._id).update(updateData)));
                 resolve();
             })
                 .catch((err) => {
@@ -187,17 +181,36 @@ class Onfirework {
      */
     deleteDocs(filter) {
         return new Promise((resolve, reject) => {
-            let call = this.db.collection(this.collection);
-            if (filter)
-                filter.map((data) => {
-                    call = call.where(...data);
-                    return call;
-                });
-            call
-                .get()
-                .then((querySnapshot) => {
-                querySnapshot.forEach((doc) => doc.ref.delete());
+            const call = this.db.collection(this.collection);
+            this.listDocs(filter)
+                .then(async (docs) => {
+                await Promise.all(docs.map((doc) => call.doc(doc._id).delete()));
                 resolve();
+            })
+                .catch((err) => {
+                if (err) {
+                    console.error(err);
+                    reject(Error(err));
+                }
+                else {
+                    reject(Error('Internal server error !'));
+                }
+            });
+        });
+    }
+    /**
+     * Gets first document according to filtering.
+     *
+     * @param {Filter<T>[]} [filter]
+     * @return {*}  {Promise<Result<T>>}
+     * @memberof Onfirework
+     * @see https://firebase.google.com/docs/firestore/query-data/queries
+     */
+    listFirst(filter) {
+        return new Promise((resolve, reject) => {
+            this.listDocs(filter)
+                .then((docs) => {
+                resolve(docs[0]);
             })
                 .catch((err) => {
                 if (err) {
@@ -246,9 +259,17 @@ class Onfirework {
         else {
             if (limit)
                 call = call.limit(limit);
-            return await this.executeQuery(call);
+            return this.executeQuery(call);
         }
     }
+    /**
+     * Query execution
+     *
+     * @private
+     * @param {DocumentData} call
+     * @return {*}  {Promise<Result<T>[]>}
+     * @memberof Onfirework
+     */
     executeQuery(call) {
         return new Promise((resolve, reject) => {
             call
@@ -257,40 +278,6 @@ class Onfirework {
                 const results = [];
                 querySnapshot.forEach((doc) => results.push(Object.assign({ _id: doc.id }, doc.data())));
                 resolve(results);
-            })
-                .catch((err) => {
-                if (err) {
-                    console.error(err);
-                    reject(Error(err));
-                }
-                else {
-                    reject(Error('Internal server error !'));
-                }
-            });
-        });
-    }
-    /**
-     * Gets first document according to filtering.
-     *
-     * @param {Filter<T>[]} [filter]
-     * @return {*}  {Promise<Result<T>>}
-     * @memberof Onfirework
-     * @see https://firebase.google.com/docs/firestore/query-data/queries
-     */
-    listFirst(filter) {
-        return new Promise((resolve, reject) => {
-            let call = this.db.collection(this.collection);
-            if (filter)
-                filter.map((data) => {
-                    call = call.where(...data);
-                    return call;
-                });
-            call.limit(1)
-                .get()
-                .then((querySnapshot) => {
-                const results = [];
-                querySnapshot.forEach((doc) => results.push(Object.assign({ _id: doc.id }, doc.data())));
-                resolve(results[0]);
             })
                 .catch((err) => {
                 if (err) {
